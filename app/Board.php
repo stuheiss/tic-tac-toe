@@ -103,4 +103,15 @@ class Board extends Model
         }
         return null;
     }
+
+    public static function corners()
+    {
+        $corners = [];
+        foreach ([0, self::ROWS - 1] as $row) {
+            foreach ([0, self::COLS -1] as $col) {
+                $corners[] = ['row' => $row, 'col' => $col];
+            }
+        }
+        return $corners;
+    }
 }

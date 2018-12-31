@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 class GameController extends Controller
 {
     protected $game;
+
     const AISTRATEGY = [
         'easy' => 'getAiRandom',
         'medium' => 'getAiWinning',
@@ -19,15 +20,14 @@ class GameController extends Controller
 
     public function __construct()
     {
-        // $this->game = new Game;
         $this->game = (new Game)->find(1);
     }
 
     public function index()
     {
-        $board = $this->game->getBoard();
-        $player = $this->game->getPlayer();
-        $ai = $this->game->getAi();
+        $board = $this->game->board;
+        $player = $this->game->player;
+        $ai = $this->game->ai;
         $winner = Board::hasWinner($board);
         $emptyCells = Board::getEmptyCells($board);
 
@@ -35,15 +35,13 @@ class GameController extends Controller
             $strategy = self::AISTRATEGY[$ai];
             $cell = $this->game->$strategy($board, $player);
             $move = Board::numberFromRowCol($cell['row'], $cell['col']);
-            if ($newBoard = $this->game->makeMove($move, $board, $player)) {
-                $this->game->setBoard($newBoard);
-                $this->game->setPlayer($player == 'X' ? 'O' : 'X');
-                $old = Session::get('status');
-                return redirect('/')->with('status', "$old, AI plays $move");
-            } else {
-                $old = Session::get('status');
-                return redirect('/')->with('status', "$old, Illegal move, try again");
-            }
+            $newBoard = $this->game->makeMove($move, $board, $player);
+            $this->game->board = $newBoard;
+            $this->game->player = $this->game->opponent($player);
+            $this->game->save();
+            // flash last and new status
+            $previousStatus = Session::get('status');
+            return redirect('/')->with('status', "$previousStatus, AI plays $move");
         }
 
         return view(
@@ -67,20 +65,21 @@ class GameController extends Controller
 
     public function move(Request $request)
     {
-        $board = $this->game->getBoard();
-        $player = $this->game->getPlayer();
+        $board = $this->game->board;
+        $player = $this->game->player;
         $winner = Board::hasWinner($board);
         $emptyCells = Board::getEmptyCells($board);
         if ($winner || !$emptyCells) {
-            return redirect('/')->with('status', 'Game over dude!!!');
+            return redirect('/')->with('status', 'Game Over Dude!!!');
         }
         $move = $request->validate(['move' => 'required|integer|between:1,9'])['move'];
         if ($newBoard = $this->game->makeMove($move, $board, $player)) {
-            $this->game->setBoard($newBoard);
-            $this->game->setPlayer($player == 'X' ? 'O' : 'X');
-            return redirect('/')->with('status', "{$player} plays {$move}");
+            $this->game->board = $newBoard;
+            $this->game->player = $this->game->opponent($player);
+            $this->game->save();
+            return redirect('/')->with('status', "{$player} plays $move");
         } else {
-            return redirect('/')->with('status', 'Illegal move, try again');
+            return redirect('/')->with('status', "Illegal move, try again");
         }
     }
 }

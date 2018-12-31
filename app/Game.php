@@ -12,50 +12,12 @@ class Game extends Model
         'board' => 'array',
     ];
 
-    public function getBoard()
-    {
-        return $this->board;
-        // return Session::get('board');
-    }
-
-    public function getPlayer()
-    {
-        return $this->player;
-        // return Session::get('player');
-    }
-
-    public function getAi()
-    {
-        return $this->ai;
-        // return Session::get('ai');
-    }
-
-    public function setBoard($board)
-    {
-        // Session::put('board', $board);
-        $this->board = $board;
-        $this->save();
-    }
-
-    public function setPlayer($player)
-    {
-        // Session::put('player', $player);
-        $this->player = $player;
-        $this->save();
-    }
-
-    public function setAi($ai)
-    {
-        // Session::put('ai', $ai);
-        $this->ai = $ai;
-        $this->save();
-    }
-
     public function newGame($ai = null)
     {
-        $this->setBoard(Board::newBoard());
-        $this->setPlayer('X');
-        $this->setAi($ai);
+        $this->board = Board::newBoard();
+        $this->player = 'X';
+        $this->ai = $ai;
+        $this->save();
     }
 
     public function makeMove($move, $board, $player)
@@ -128,13 +90,7 @@ class Game extends Model
     public function getExcellentFirstMove()
     {
         // corner moves are best first moves
-        $moves = [
-            ['row' => 0, 'col' => 0],
-            ['row' => 0, 'col' => 2],
-            ['row' => 2, 'col' => 0],
-            ['row' => 2, 'col' => 2],
-        ];
-        return array_random($moves);
+        return array_random(Board::corners());
     }
 
     /**

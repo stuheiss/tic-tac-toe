@@ -33,6 +33,18 @@
 @if($board)
   @if($winner)
     <div class='alert alert-success'>WINNER: {{ $winner }}!!!</div>
+    @if($ai)
+      <div class='alert alert-success'>AI does it again!!! Rah, rah, rah, sis, boom, bah!!!</div>
+      <?php
+      $gif = array_random([
+        'https://media.giphy.com/media/3ov9k9rfNY629GtqqQ/giphy.gif',
+        'https://media.giphy.com/media/5nofgDw1cFCe5gZv7m/giphy.gif',
+        'https://media.giphy.com/media/duXzJTVaT8pkk/giphy.gif',
+        'https://media.giphy.com/media/2fyQcqctG8JWgXDm1T/giphy.gif',
+      ]);
+      ?>
+      <img src="{{ $gif }}">
+    @endif
   @endif
 
   @if(!$winner && !$playsleft)

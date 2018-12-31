@@ -26,4 +26,13 @@ class GameTest extends TestCase
             }
         }
     }
+
+    /** @test */
+    public function ai_random_makes_excellent_first_move()
+    {
+        $game = new Game;
+        $board = Board::newBoard();
+        $cell = $game->getAiRandom($board, null);
+        $this->assertNotFalse(array_search($cell, Board::corners()));
+    }
 }

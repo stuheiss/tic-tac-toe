@@ -10,32 +10,41 @@ class Game extends Model
 {
     public function getBoard()
     {
-        return Session::get('board');
+        return json_decode($this->board);
+        // return Session::get('board');
     }
 
     public function getPlayer()
     {
-        return Session::get('player');
+        return $this->player;
+        // return Session::get('player');
     }
 
     public function getAi()
     {
-        return Session::get('ai');
+        return $this->ai;
+        // return Session::get('ai');
     }
 
     public function setBoard($board)
     {
-        Session::put('board', $board);
+        // Session::put('board', $board);
+        $this->board = json_encode($board);
+        $this->save();
     }
 
     public function setPlayer($player)
     {
-        Session::put('player', $player);
+        // Session::put('player', $player);
+        $this->player = $player;
+        $this->save();
     }
 
     public function setAi($ai)
     {
-        Session::put('ai', $ai);
+        // Session::put('ai', $ai);
+        $this->ai = $ai;
+        $this->save();
     }
 
     public function newGame($ai = null)
@@ -43,12 +52,11 @@ class Game extends Model
         $this->setBoard(Board::newBoard());
         $this->setPlayer('X');
         $this->setAi($ai);
-        $this->dbgSetupBoard($ai);
     }
 
     public function makeMove($move, $board, $player)
     {
-        return Board::moveTo($player, $move, $board);
+        return Board::playerMoveTo($player, $move, $board);
     }
 
     public function getAiRandom($board, $player)
@@ -71,7 +79,7 @@ class Game extends Model
             return $this->getExcellentFirstMove();
         }
         foreach ($cells as $cell) {
-            $newBoard = Board::moveTo($player, Board::moveFromRowCol($cell['row'], $cell['col']), $board);
+            $newBoard = Board::playerMoveTo($player, Board::numberFromRowCol($cell['row'], $cell['col']), $board);
             $winner = Board::hasWinner($newBoard);
             if ($winner) {
                 return $cell;
@@ -90,7 +98,7 @@ class Game extends Model
             return $this->getExcellentFirstMove();
         }
         foreach ($cells as $cell) {
-            $newBoard = Board::moveTo($player, Board::moveFromRowCol($cell['row'], $cell['col']), $board);
+            $newBoard = Board::playerMoveTo($player, Board::numberFromRowCol($cell['row'], $cell['col']), $board);
 
             $opponent = $this->opponent($player);
 
@@ -144,70 +152,20 @@ class Game extends Model
      */
     public function minimaxScore($board, $player, $playerToOptimize, $level=0)
     {
-        $winner = Board::hasWinner($board);
-        $score = null;
-        if ($winner === $playerToOptimize) {
-            $score = 10;
-        } else if ($winner) {
-        }
-        $cells = Board::getEmptyCells($board);
-        if (!$cells) {
-            // return 0;
-            $score = 0;
-        }
-        if ($score !== null) {
-            return $score;
+        if ($winner = Board::hasWinner($board)) {
+            return $winner === $playerToOptimize ? 10 : -10;
+        } else if (!($cells = Board::getEmptyCells($board))) {
+            return 0;
         }
 
         $scores = [];
         foreach ($cells as $cell) {
-            $newBoard = Board::moveTo($player, Board::moveFromRowCol($cell['row'], $cell['col']), $board);
+            $newBoard = Board::playerMoveTo($player, Board::numberFromRowCol($cell['row'], $cell['col']), $board);
 
             $opponent = $this->opponent($player);
             $score = $this->minimaxScore($newBoard, $opponent, $playerToOptimize, $level+1);
             $scores[] = $score;
         }
         return ($player === $playerToOptimize) ? max($scores) : min($scores);
-    }
-
-    // debugging helpers
-    public function dbgSetupBoard($ai)
-    {
-        return;
-        if ($ai !== 'hard') return;
-        $board = $this->getBoard();
-        $player = $this->getPlayer();
-        // $moves = [2,1,4,3,5,8,7,9]; // only possible move wins
-        // $moves = [2,1,4,3,5,8,7]; // 2 possible moves could win or tie
-        // $moves = [2,1,4,3,5,8];
-        $moves = [5,3];
-
-        foreach ($moves as $move) {
-            $board = $this->makeMove($move, $board, $player);
-            echo '<pre>';
-            echo "player:{$player} moves to {$move}\n";
-            echo $this->boardtos($board);
-            echo '</pre>';
-            $this->setBoard($board);
-            $player = $this->opponent($player);
-            $this->setPlayer($player);
-        }
-    }
-
-    public function celltos($cell)
-    {
-        return "({$cell['row']},{$cell['col']})";
-    }
-    public function cellstos($cells)
-    {
-        return implode(',', array_map(function ($c) { return $this->celltos($c); }, $cells));
-    }
-    public function boardtos($board)
-    {
-        $str = '';
-        foreach ($board as $row) {
-            $str .= implode('', $row) . "\n";
-        }
-        return $str;
     }
 }

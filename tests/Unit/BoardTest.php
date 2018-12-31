@@ -32,14 +32,14 @@ class BoardTest extends TestCase
     /** @test */
     public function a_move_can_transform_to_coordinates()
     {
-        list($row, $col) = \App\Board::moveToRowCol(6);
+        list($row, $col) = \App\Board::numberToRowCol(6);
         $this->assertEquals([1,2], [$row,$col]);
     }
 
     /** @test */
     public function a_coordiante_pair_can_transform_to_a_move()
     {
-        $move = \App\Board::moveFromRowCol(1, 2);
+        $move = \App\Board::numberFromRowCol(1, 2);
         $this->assertEquals(6, $move);
     }
 
@@ -47,18 +47,7 @@ class BoardTest extends TestCase
     public function a_player_can_move_to_an_empty_cell()
     {
         $board = \App\Board::newBoard();
-        $board = \App\Board::move('X', 0, 0, $board);
-        $res = collect($board)->collapse()->reduce(function ($acc, $cur) {
-            return $acc . $cur;
-        });
-        $this->assertEquals('X23456789', $res);
-    }
-
-    /** @test */
-    public function a_player_can_moveto_an_empty_cell()
-    {
-        $board = \App\Board::newBoard();
-        $board = \App\Board::moveTo('X', 1, $board);
+        $board = \App\Board::playerMoveTo('X', 1, $board);
         $res = collect($board)->collapse()->reduce(function ($acc, $cur) {
             return $acc . $cur;
         });
@@ -69,8 +58,8 @@ class BoardTest extends TestCase
     public function a_player_cannot_move_to_an_occupied_cell()
     {
         $board = \App\Board::newBoard();
-        $board = \App\Board::move('X', 0, 0, $board);
-        $board2 = \App\Board::move('O', 0, 0, $board);
+        $board = \App\Board::playerMoveTo('X', 1, $board);
+        $board2 = \App\Board::playerMoveTo('O', 1, $board);
 
         $this->assertFalse($board2);
     }
@@ -79,7 +68,7 @@ class BoardTest extends TestCase
     public function a_list_of_empty_cells_can_be_generated()
     {
         $board = \App\Board::newBoard();
-        $board = \App\Board::move('X', 1, 1, $board);
+        $board = \App\Board::playerMoveTo('X', 5, $board);
         $cells = \App\Board::getEmptyCells($board);
 
         $res = collect($cells)->reduce(
@@ -94,9 +83,9 @@ class BoardTest extends TestCase
     public function can_find_a_row_winner()
     {
         $board = \App\Board::newBoard();
-        $board = \App\Board::move('X', 0, 0, $board);
-        $board = \App\Board::move('X', 0, 1, $board);
-        $board = \App\Board::move('X', 0, 2, $board);
+        $board = \App\Board::playerMoveTo('X', 1, $board);
+        $board = \App\Board::playerMoveTo('X', 2, $board);
+        $board = \App\Board::playerMoveTo('X', 3, $board);
 
         $this->assertEquals('X', \App\Board::hasWinner($board));
     }
@@ -105,9 +94,9 @@ class BoardTest extends TestCase
     public function can_find_a_col_winner()
     {
         $board = \App\Board::newBoard();
-        $board = \App\Board::move('X', 0, 0, $board);
-        $board = \App\Board::move('X', 1, 0, $board);
-        $board = \App\Board::move('X', 2, 0, $board);
+        $board = \App\Board::playerMoveTo('X', 1, $board);
+        $board = \App\Board::playerMoveTo('X', 4, $board);
+        $board = \App\Board::playerMoveTo('X', 7, $board);
 
         $this->assertEquals('X', \App\Board::hasWinner($board));
     }
@@ -116,9 +105,9 @@ class BoardTest extends TestCase
     public function can_find_a_left_diagonal_winner()
     {
         $board = \App\Board::newBoard();
-        $board = \App\Board::move('X', 0, 0, $board);
-        $board = \App\Board::move('X', 1, 1, $board);
-        $board = \App\Board::move('X', 2, 2, $board);
+        $board = \App\Board::playerMoveTo('X', 1, $board);
+        $board = \App\Board::playerMoveTo('X', 5, $board);
+        $board = \App\Board::playerMoveTo('X', 9, $board);
 
         $this->assertEquals('X', \App\Board::hasWinner($board));
     }
@@ -127,9 +116,9 @@ class BoardTest extends TestCase
     public function can_find_a_right_diagonal_winner()
     {
         $board = \App\Board::newBoard();
-        $board = \App\Board::move('X', 2, 0, $board);
-        $board = \App\Board::move('X', 1, 1, $board);
-        $board = \App\Board::move('X', 0, 2, $board);
+        $board = \App\Board::playerMoveTo('X', 3, $board);
+        $board = \App\Board::playerMoveTo('X', 5, $board);
+        $board = \App\Board::playerMoveTo('X', 7, $board);
 
         $this->assertEquals('X', \App\Board::hasWinner($board));
     }
@@ -145,14 +134,14 @@ class BoardTest extends TestCase
     /** @test */
     public function can_convert_move_to_row_col()
     {
-        list($row, $col) = \App\Board::moveToRowCol(4);
+        list($row, $col) = \App\Board::numberToRowCol(4);
         $this->assertEquals([$row, $col], [1, 0]);
     }
 
     /** @test */
     public function can_convert_row_col_to_move()
     {
-        $move = \App\Board::moveFromRowCol(1, 0);
+        $move = \App\Board::numberFromRowCol(1, 0);
         $this->assertEquals($move, 4);
     }
 }

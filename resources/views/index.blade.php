@@ -3,18 +3,31 @@
 @section('title', 'Tic Tac Toe')
 
 @section('content')
-
+<div style='margin-left:50px; margin-top:50px;'>
 <h1>Tic Tac Toe</h1>
 
-<a href='/play'>Start a new 2 player game</a><br>
-<a href='/play/easy'>Start a new easy ai vs human game</a><br>
-<a href='/play/medium'>Start a new medium ai vs human game</a><br>
-<a href='/play/hard'>Start a new hard ai vs human game</a><br>
+<div>
+  Start a new game:<br>
+<ul>
+<li>
+  <a href='/play'>Human vs Human</a><br>
+</li>
+<li>
+  <a href='/play/easy'>Easy AI vs Human</a><br>
+</li>
+<li>
+  <a href='/play/medium'>Medium AI vs Human</a><br>
+</li>
+<li>
+  <a href='/play/hard'>Hard AI vs Human</a>
+</li>
+</ul>
+</div>
 
 @if (session('status'))
-    <div class="alert alert-danger">
-        {{ session('status') }}
-    </div>
+  <div class="alert alert-danger">
+    {{ session('status') }}
+  </div>
 @endif
 
 @if($board)
@@ -29,7 +42,7 @@
   @if($ai)
     <div>AI: {{ $ai }}</div>
   @endif
-  <div>Player: {{ $player }}</div>
+  <div>Player: {{ $player }} is up</div>
   <div>
     @foreach($board as $row)
       <div>
@@ -46,5 +59,5 @@
     @endforeach
   </div>
 @endif
-
+</div>
 @endsection

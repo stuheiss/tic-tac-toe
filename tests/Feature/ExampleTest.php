@@ -7,6 +7,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ExampleTest extends TestCase
 {
+    use RefreshDatabase;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->seed('DatabaseSeeder');
+    }
+
     /**
      * A basic test example.
      *

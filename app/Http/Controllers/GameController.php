@@ -19,7 +19,8 @@ class GameController extends Controller
 
     public function __construct()
     {
-        $this->game = new Game;
+        // $this->game = new Game;
+        $this->game = (new Game)->find(1);
     }
 
     public function index()
@@ -33,13 +34,15 @@ class GameController extends Controller
         if ($ai && $player === 'X' && !$winner && $emptyCells) {
             $strategy = self::AISTRATEGY[$ai];
             $cell = $this->game->$strategy($board, $player);
-            $move = Board::moveFromRowCol($cell['row'], $cell['col']);
+            $move = Board::numberFromRowCol($cell['row'], $cell['col']);
             if ($newBoard = $this->game->makeMove($move, $board, $player)) {
                 $this->game->setBoard($newBoard);
                 $this->game->setPlayer($player == 'X' ? 'O' : 'X');
-                return redirect('/')->with('status', "AI plays $move");
+                $old = Session::get('status');
+                return redirect('/')->with('status', "$old, AI plays $move");
             } else {
-                return redirect('/')->with('status', 'Illegal move, try again');
+                $old = Session::get('status');
+                return redirect('/')->with('status', "$old, Illegal move, try again");
             }
         }
 
@@ -57,8 +60,9 @@ class GameController extends Controller
     public function play(Request $request)
     {
         $difficulty = $request->difficulty;
+        if ($difficulty === null) $difficulty = '';
         $this->game->newGame($difficulty);
-        return redirect('/');
+        return redirect('/')->with('status', 'Good luck champ');
     }
 
     public function move(Request $request)
@@ -74,7 +78,7 @@ class GameController extends Controller
         if ($newBoard = $this->game->makeMove($move, $board, $player)) {
             $this->game->setBoard($newBoard);
             $this->game->setPlayer($player == 'X' ? 'O' : 'X');
-            return redirect('/');
+            return redirect('/')->with('status', "{$player} plays {$move}");
         } else {
             return redirect('/')->with('status', 'Illegal move, try again');
         }

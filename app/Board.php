@@ -21,7 +21,7 @@ class Board extends Model
         return $board;
     }
 
-    public static function moveToRowCol($number)
+    public static function numberToRowCol($number)
     {
         $number--; // make 0 based
         $row = intdiv($number, self::ROWS);
@@ -29,24 +29,15 @@ class Board extends Model
         return [$row, $col];
     }
 
-    public static function moveFromRowCol($row, $col)
+    public static function numberFromRowCol($row, $col)
     {
         return $row * self::ROWS + $col + 1;
     }
 
-    public static function move($player, $row, $col, $board)
+    public static function playerMoveTo($player, $move, $board)
     {
-        if ($board[$row][$col] == 'X' || $board[$row][$col] == 'O') {
-            return false;
-        }
-        $board[$row][$col] = $player;
-        return $board;
-    }
-
-    public static function moveTo($player, $move, $board)
-    {
-        if (!is_numeric($move)) return false;
-        list($row, $col) = self::moveToRowCol($move);
+        list($row, $col) = self::numberToRowCol($move);
+        if (!is_numeric($board[$row][$col])) return false;
         $board[$row][$col] = $player;
         return $board;
     }
@@ -59,10 +50,9 @@ class Board extends Model
         }
         for ($row = 0; $row < self::ROWS; ++$row) {
             for ($col = 0; $col < self::COLS; ++$col) {
-                if ($board[$row][$col] == 'X' || $board[$row][$col] == 'O') {
-                    continue;
+                if (is_numeric($board[$row][$col])) {
+                    $moves[] = ['row' => $row, 'col' => $col];
                 }
-                $moves[] = ['row' => $row, 'col' => $col];
             }
         }
         return $moves;

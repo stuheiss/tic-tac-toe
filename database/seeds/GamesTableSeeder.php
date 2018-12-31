@@ -14,11 +14,10 @@ class GamesTableSeeder extends Seeder
     public function run()
     {
         $game = factory(Game::class)->make();
-        $game->board = json_encode($game->board);
         $game->save();
 
         // DB::table('games')->insert([
-        //     'board' => json_encode(Board::newBoard()),
+        //     'board' => Board::newBoard(),
         //     'player' => 'X',
         //     'ai' => '',
         // ]);

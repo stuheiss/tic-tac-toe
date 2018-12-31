@@ -8,9 +8,13 @@ use Illuminate\Support\Facades\Session;
 
 class Game extends Model
 {
+    protected $casts = [
+        'board' => 'array',
+    ];
+
     public function getBoard()
     {
-        return json_decode($this->board);
+        return $this->board;
         // return Session::get('board');
     }
 
@@ -29,7 +33,7 @@ class Game extends Model
     public function setBoard($board)
     {
         // Session::put('board', $board);
-        $this->board = json_encode($board);
+        $this->board = $board;
         $this->save();
     }
 

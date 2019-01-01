@@ -16,7 +16,7 @@ class Game extends Model
     {
         $this->board = Board::newBoard();
         $this->player = 'X';
-        $this->ai = $ai;
+        $this->ai = (string) $ai;
         $this->save();
     }
 

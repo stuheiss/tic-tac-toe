@@ -58,7 +58,6 @@ class GameController extends Controller
     public function play(Request $request)
     {
         $difficulty = $request->difficulty;
-        if ($difficulty === null) $difficulty = '';
         $this->game->newGame($difficulty);
         return redirect('/')->with('status', 'Good luck champ');
     }

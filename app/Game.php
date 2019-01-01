@@ -20,11 +20,6 @@ class Game extends Model
         $this->save();
     }
 
-    public function makeMove($move, $board, $player)
-    {
-        return Board::playerMoveTo($player, $move, $board);
-    }
-
     public function getAiRandom($board, $player)
     {
         $cells = Board::getEmptyCells($board);

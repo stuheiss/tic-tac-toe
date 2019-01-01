@@ -35,7 +35,7 @@ class GameController extends Controller
             $strategy = self::AISTRATEGY[$ai];
             $cell = $this->game->$strategy($board, $player);
             $move = Board::numberFromRowCol($cell['row'], $cell['col']);
-            $newBoard = $this->game->makeMove($move, $board, $player);
+            $newBoard = Board::playerMoveTo($player, $move, $board);
             $this->game->board = $newBoard;
             $this->game->player = $this->game->opponent($player);
             $this->game->save();
@@ -72,7 +72,7 @@ class GameController extends Controller
             return redirect('/')->with('status', 'Game Over Dude!!!');
         }
         $move = $request->validate(['move' => 'required|integer|between:1,9'])['move'];
-        if ($newBoard = $this->game->makeMove($move, $board, $player)) {
+        if ($newBoard = Board::playerMoveTo($player, $move, $board)) {
             $this->game->board = $newBoard;
             $this->game->player = $this->game->opponent($player);
             $this->game->save();

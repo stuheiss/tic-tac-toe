@@ -1,9 +1,8 @@
 @extends('layout')
-
 @section('title', 'Tic Tac Toe')
 
 @section('content')
-<div style='margin-left:50px; margin-top:50px;'>
+<div class="border border-primary w-auto h-auto" style='margin:50px;'>
 <h1>Tic Tac Toe</h1>
 
 <div>
@@ -33,7 +32,7 @@
 @if($board)
   @if($winner)
     <div class='alert alert-success'>WINNER: {{ $winner }}!!!</div>
-    @if($ai)
+    @if($ai && $winner == 'X')
       <div class='alert alert-success'>AI does it again!!! Rah, rah, rah, sis, boom, bah!!!</div>
       <?php
       $gif = array_random([
@@ -41,6 +40,16 @@
         'https://media.giphy.com/media/5nofgDw1cFCe5gZv7m/giphy.gif',
         'https://media.giphy.com/media/duXzJTVaT8pkk/giphy.gif',
         'https://media.giphy.com/media/2fyQcqctG8JWgXDm1T/giphy.gif',
+      ]);
+      ?>
+      <img src="{{ $gif }}">
+    @else
+      <div class='alert alert-success'>What ???!!!??? You beat AI??? Must be a bug!!!</div>
+      <?php
+      $gif = array_random([
+        'https://media.giphy.com/media/Ab2tLKySwKI48/giphy.gif',
+        'https://media.giphy.com/media/McL8Gf7q6LAY0/giphy.gif',
+        'https://media.giphy.com/media/5nj4KLBy2mhkH1pUWT/giphy.gif',
       ]);
       ?>
       <img src="{{ $gif }}">
@@ -54,8 +63,10 @@
   @if($ai)
     <div>AI: {{ $ai }}</div>
   @endif
-  <div>Player: {{ $player }} is up</div>
-  <div>
+  @if(!$winner)
+    <div class='alert alert-primary'>Player: {{ $player }} is up</div>
+  @endif
+  <div style='margin:10px;'>
     @foreach($board as $row)
       <div>
       @foreach($row as $cell)

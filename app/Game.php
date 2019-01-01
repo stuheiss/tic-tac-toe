@@ -110,7 +110,7 @@ class Game extends Model
      * 
      * @return integer
      */
-    public function minimaxScore($board, $player, $playerToOptimize, $level=0)
+    public function minimaxScore($board, $player, $playerToOptimize)
     {
         if ($winner = Board::hasWinner($board)) {
             return $winner === $playerToOptimize ? 10 : -10;
@@ -123,7 +123,7 @@ class Game extends Model
             $newBoard = Board::playerMoveTo($player, Board::numberFromRowCol($cell['row'], $cell['col']), $board);
 
             $opponent = $this->opponent($player);
-            $score = $this->minimaxScore($newBoard, $opponent, $playerToOptimize, $level+1);
+            $score = $this->minimaxScore($newBoard, $opponent, $playerToOptimize);
             $scores[] = $score;
         }
         return ($player === $playerToOptimize) ? max($scores) : min($scores);
